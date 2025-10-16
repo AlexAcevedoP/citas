@@ -1,0 +1,177 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    // Verifica si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Verifica si el usuario es dueño de un negocio
+    function isOwner(businessId) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Verifica si el usuario es empleado de un negocio
+    function isEmployee(businessId) {
+      let business = get(/databases/$(database)/documents/businesses/$(businessId)).data;
+      return isAuthenticated() && 
+             (business.ownerId == request.auth.uid || 
+              request.auth.uid in business.employeeIds);
+    }
+    
+    // Verifica que los datos requeridos estén presentes
+    function hasRequiredBusinessFields() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['name', 'businessType', 'status', 'createdAt']);
+    }
+    
+    function hasRequiredAppointmentFields() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['businessId', 'client', 'date', 'time', 'status']);
+    }
+    
+    // ============================================
+    // BUSINESSES COLLECTION
+    // ============================================
+    
+    match /businesses/{businessId} {
+      // Lectura: Cualquiera puede ver negocios activos
+      allow read: if resource.data.status == 'active';
+      
+      // Creación: Solo usuarios autenticados
+      allow create: if isAuthenticated() && 
+                       hasRequiredBusinessFields() &&
+                       request.resource.data.ownerId == request.auth.uid &&
+                       request.resource.data.status == 'active';
+      
+      // Actualización: Solo el dueño
+      allow update: if isOwner(businessId) &&
+                       hasRequiredBusinessFields() &&
+                       request.resource.data.ownerId == resource.data.ownerId; // No cambiar dueño
+      
+      // Eliminación: Solo el dueño
+      allow delete: if isOwner(businessId);
+    }
+    
+    // ============================================
+    // APPOINTMENTS COLLECTION
+    // ============================================
+    
+    match /appointments/{appointmentId} {
+      // Lectura: Empleados del negocio o el cliente que creó la cita
+      allow read: if isEmployee(resource.data.businessId) || 
+                     (isAuthenticated() && 
+                      resource.data.client.userId == request.auth.uid);
+      
+      // Creación: Usuarios autenticados y el negocio debe existir
+      allow create: if isAuthenticated() && 
+                       hasRequiredAppointmentFields() &&
+                       exists(/databases/$(database)/documents/businesses/$(request.resource.data.businessId)) &&
+                       request.resource.data.status in ['pending', 'confirmed'];
+      
+      // Actualización: Empleados del negocio o el cliente (solo para cancelar)
+      allow update: if isEmployee(resource.data.businessId) ||
+                       (isAuthenticated() && 
+                        resource.data.client.userId == request.auth.uid &&
+                        request.resource.data.status == 'cancelled');
+      
+      // Eliminación: Solo dueños del negocio
+      allow delete: if isOwner(resource.data.businessId);
+    }
+    
+    // ============================================
+    // CUSTOMERS COLLECTION
+    // ============================================
+    
+    match /customers/{customerId} {
+      // Solo empleados del negocio pueden leer/escribir
+      allow read: if isEmployee(resource.data.businessId);
+      
+      allow create: if isEmployee(request.resource.data.businessId) &&
+                       request.resource.data.keys().hasAll(['businessId', 'name', 'phone']);
+      
+      allow update: if isEmployee(resource.data.businessId);
+      
+      allow delete: if isOwner(resource.data.businessId);
+    }
+    
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
+    
+    match /users/{userId} {
+      // Solo el propio usuario puede leer/escribir sus datos
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // REVIEWS COLLECTION
+    // ============================================
+    
+    match /reviews/{reviewId} {
+      // Todos pueden leer reseñas publicadas
+      allow read: if resource.data.status == 'published';
+      
+      // Solo clientes autenticados pueden crear
+      allow create: if isAuthenticated() &&
+                       exists(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)) &&
+                       request.resource.data.customerId == request.auth.uid &&
+                       request.resource.data.rating >= 1 &&
+                       request.resource.data.rating <= 5;
+      
+      // Solo el dueño del negocio puede responder o cambiar status
+      allow update: if isOwner(resource.data.businessId);
+      
+      // Solo el dueño puede eliminar
+      allow delete: if isOwner(resource.data.businessId);
+    }
+    
+    // ============================================
+    // NOTIFICATIONS COLLECTION (opcional)
+    // ============================================
+    
+    match /notifications/{notificationId} {
+      // Solo el usuario destinatario puede leer sus notificaciones
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // El sistema crea notificaciones (Cloud Functions)
+      // Los usuarios solo pueden marcarlas como leídas
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt']);
+    }
+    
+    // ============================================
+    // SUBSCRIPTIONS COLLECTION (para planes)
+    // ============================================
+    
+    match /subscriptions/{subscriptionId} {
+      // Solo el dueño del negocio puede leer su suscripción
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Solo el sistema puede crear/actualizar suscripciones
+      // (Esto se maneja por Cloud Functions después del pago)
+      allow create, update, delete: if false;
+    }
+    
+    // ============================================
+    // ANALYTICS COLLECTION (opcional)
+    // ============================================
+    
+    match /analytics/{businessId}/stats/{statId} {
+      // Solo dueños y empleados pueden ver estadísticas
+      allow read: if isEmployee(businessId);
+      
+      // Solo el sistema puede escribir estadísticas
+      allow write: if false;
+    }
+  }
+}
