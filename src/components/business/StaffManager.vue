@@ -66,7 +66,9 @@ const filteredStaff = computed(() => {
   let list = staff.value
   if (search.value.trim()) {
     const term = search.value.toLowerCase()
-    list = list.filter((s) => s.name?.toLowerCase().includes(term) || s.email?.toLowerCase().includes(term))
+    list = list.filter(
+      (s) => s.name?.toLowerCase().includes(term) || s.email?.toLowerCase().includes(term),
+    )
   }
   if (roleFilter.value !== 'all') {
     list = list.filter((s) => (s.role || '').toLowerCase() === roleFilter.value)
@@ -103,7 +105,9 @@ const openEdit = (person) => {
     email: person.email || '',
     phone: person.phone || '',
     role: person.role || 'specialist',
-    specialties: Array.isArray(person.specialties) ? person.specialties.join(', ') : (person.specialties || ''),
+    specialties: Array.isArray(person.specialties)
+      ? person.specialties.join(', ')
+      : person.specialties || '',
     active: person.active ?? true,
   }
   errors.value = {}
@@ -117,7 +121,10 @@ const save = async () => {
     const payload = {
       ...form.value,
       specialties: form.value.specialties
-        ? form.value.specialties.split(',').map((s) => s.trim()).filter(Boolean)
+        ? form.value.specialties
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
         : [],
       updatedAt: serverTimestamp(),
     }
@@ -206,7 +213,10 @@ const removeMember = async (id) => {
                 <td class="fw-semibold">{{ p.name }}</td>
                 <td class="text-capitalize">{{ p.role }}</td>
                 <td>
-                  <span v-if="Array.isArray(p.specialties) && p.specialties.length" class="text-muted small">
+                  <span
+                    v-if="Array.isArray(p.specialties) && p.specialties.length"
+                    class="text-muted small"
+                  >
                     {{ p.specialties.join(', ') }}
                   </span>
                   <span v-else class="text-muted small">—</span>
@@ -234,7 +244,12 @@ const removeMember = async (id) => {
     </div>
 
     <!-- Modal -->
-    <div v-if="showModal" class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div
+      v-if="showModal"
+      class="modal d-block"
+      tabindex="-1"
+      style="background: rgba(0, 0, 0, 0.5)"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -244,13 +259,22 @@ const removeMember = async (id) => {
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Nombre</label>
-              <input v-model="form.name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }" />
+              <input
+                v-model="form.name"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': errors.name }"
+              />
               <div class="invalid-feedback" v-if="errors.name">{{ errors.name }}</div>
             </div>
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label">Rol</label>
-                <select v-model="form.role" class="form-select" :class="{ 'is-invalid': errors.role }">
+                <select
+                  v-model="form.role"
+                  class="form-select"
+                  :class="{ 'is-invalid': errors.role }"
+                >
                   <option value="admin">Administrador</option>
                   <option value="specialist">Especialista</option>
                   <option value="receptionist">Recepcionista</option>
@@ -260,7 +284,12 @@ const removeMember = async (id) => {
               </div>
               <div class="col-md-6">
                 <label class="form-label">Especialidades</label>
-                <input v-model="form.specialties" type="text" class="form-control" placeholder="Ej: Facial, Dermocosmética" />
+                <input
+                  v-model="form.specialties"
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej: Facial, Dermocosmética"
+                />
               </div>
             </div>
             <div class="row g-3 mt-1">
@@ -279,7 +308,9 @@ const removeMember = async (id) => {
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showModal = false">Cancelar</button>
+            <button type="button" class="btn btn-secondary" @click="showModal = false">
+              Cancelar
+            </button>
             <button type="button" class="btn btn-primary" @click="save" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
               Guardar
@@ -292,7 +323,8 @@ const removeMember = async (id) => {
 </template>
 
 <style scoped>
-.table td, .table th {
+.table td,
+.table th {
   vertical-align: middle;
 }
 </style>

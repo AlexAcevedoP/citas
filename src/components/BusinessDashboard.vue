@@ -6,6 +6,8 @@ import { getAuth } from 'firebase/auth'
 import AppointmentsManager from './business/AppointmentsManager.vue'
 import ServicesManager from './business/ServicesManager.vue'
 import StaffManager from './business/StaffManager.vue'
+import BillingManager from './business/BillingManager.vue'
+import ReportsManager from './business/ReportsManager.vue'
 
 const businessStore = useBusinessStore()
 const appointmentsStore = useAppointmentsStore()
@@ -278,6 +280,16 @@ const toggleSidebar = () => {
         <!-- Módulo Personal -->
         <div v-else-if="currentModule === 'staff'" class="staff-module">
           <StaffManager :business="business" />
+        </div>
+
+        <!-- Módulo Facturación -->
+        <div v-else-if="currentModule === 'billing'" class="billing-module">
+          <BillingManager :business="business" />
+        </div>
+
+        <!-- Módulo Reportes -->
+        <div v-else-if="currentModule === 'reports'" class="reports-module">
+          <ReportsManager :business="business" />
         </div>
 
         <!-- Otros módulos -->

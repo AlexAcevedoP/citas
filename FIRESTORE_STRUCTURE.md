@@ -91,6 +91,82 @@ Almacena información de cada negocio registrado en la plataforma.
 
 ---
 
+## 📊 Subcolecciones por Negocio
+
+### **businesses/{businessId}/services** (Servicios)
+
+Servicios ofrecidos por el negocio.
+
+```javascript
+{
+  id: "auto-generated-id",
+  name: "Limpieza Facial Profunda",
+  description: "Limpieza facial con extracción y mascarilla",
+  duration: 60, // minutos
+  price: 800,
+  category: "diagnostico", // diagnostico | biocompatible | mantenimiento | otros
+  active: true,
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### **businesses/{businessId}/staff** (Personal)
+
+Personal del negocio.
+
+```javascript
+{
+  id: "auto-generated-id",
+  name: "Dra. María González",
+  email: "maria@example.com",
+  phone: "+52 555-1234",
+  role: "specialist", // admin | specialist | receptionist | employee
+  specialties: ["Facial", "Dermocosmética", "Peeling"],
+  active: true,
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### **businesses/{businessId}/users** (Usuarios del Negocio)
+
+Usuarios con acceso al panel del negocio (vinculados con Firebase Auth).
+
+```javascript
+{
+  id: "firebase-auth-uid",
+  email: "admin@example.com",
+  name: "Admin Usuario",
+  role: "admin", // admin | specialist | receptionist
+  createdAt: Timestamp
+}
+```
+
+### **businesses/{businessId}/payments** (Pagos)
+
+Registro de pagos realizados en el negocio.
+
+```javascript
+{
+  id: "auto-generated-id",
+  appointmentId: "ref-to-appointment", // opcional
+  amount: 800,
+  method: "card", // cash | card | transfer
+  status: "completed", // pending | completed | cancelled | refunded
+  date: "2025-10-18", // YYYY-MM-DD
+  customerName: "Juan Pérez",
+  serviceName: "Limpieza Facial",
+  notes: "Pago con tarjeta de crédito",
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+---
+
+## 📊 Colecciones Principales (Globales)
+
 ### 2. **appointments** (Citas)
 
 Almacena todas las citas de todos los negocios.
