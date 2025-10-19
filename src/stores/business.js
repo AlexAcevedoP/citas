@@ -7,8 +7,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  query,
-  where,
   serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useBusinessStore } from '../stores/business'
 
 const businessStore = useBusinessStore()

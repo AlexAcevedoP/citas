@@ -1,15 +1,6 @@
 <script setup>
 import { ref, reactive } from 'vue'
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-  updateDoc,
-  doc,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 
