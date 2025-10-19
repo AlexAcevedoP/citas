@@ -8,6 +8,7 @@ import ServicesManager from './business/ServicesManager.vue'
 import StaffManager from './business/StaffManager.vue'
 import BillingManager from './business/BillingManager.vue'
 import ReportsManager from './business/ReportsManager.vue'
+import SettingsManager from './business/SettingsManager.vue'
 
 const businessStore = useBusinessStore()
 const appointmentsStore = useAppointmentsStore()
@@ -290,6 +291,11 @@ const toggleSidebar = () => {
         <!-- Módulo Reportes -->
         <div v-else-if="currentModule === 'reports'" class="reports-module">
           <ReportsManager :business="business" />
+        </div>
+
+        <!-- Módulo Configuración -->
+        <div v-else-if="currentModule === 'settings'" class="settings-module">
+          <SettingsManager :business="business" />
         </div>
 
         <!-- Otros módulos -->
