@@ -100,7 +100,10 @@ onMounted(async () => {
 
   // Cargar clientes del negocio
   try {
-    const customersQ = query(collection(db, 'customers'), where('businessId', '==', props.business.id))
+    const customersQ = query(
+      collection(db, 'customers'),
+      where('businessId', '==', props.business.id),
+    )
     const customersSnap = await getDocs(customersQ)
     clients.value = customersSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
   } catch (e) {
@@ -122,7 +125,7 @@ onMounted(async () => {
     const staffRef = collection(db, `businesses/${props.business.id}/staff`)
     const staffSnap = await getDocs(staffRef)
     specialists.value = staffSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
-    
+
     // Fallback: si no existe 'staff', intentar cargar desde 'users' con roles
     if (specialists.value.length === 0) {
       const usersRef = collection(db, `businesses/${props.business.id}/users`)
@@ -230,7 +233,8 @@ const openCreateModal = (date = null, time = null) => {
   selectedDate.value = date
   selectedTime.value = time
   resetForm()
-  if (date) form.value.date = typeof date === 'string' ? date : new Date(date).toISOString().split('T')[0]
+  if (date)
+    form.value.date = typeof date === 'string' ? date : new Date(date).toISOString().split('T')[0]
   if (time) form.value.time = time
   showAppointmentModal.value = true
 }
@@ -291,7 +295,12 @@ const saveAppointment = async () => {
     }
     const docRef = await addDoc(collection(db, 'customers'), newCustomer)
     clientData = { id: docRef.id, ...newCustomer, createdAt: new Date() }
-    clients.value.push({ id: docRef.id, name: clientData.name, phone: clientData.phone, email: clientData.email })
+    clients.value.push({
+      id: docRef.id,
+      name: clientData.name,
+      phone: clientData.phone,
+      email: clientData.email,
+    })
   }
 
   const payload = {
@@ -588,22 +597,46 @@ const saveAppointment = async () => {
                     </div>
                   </div>
                   <div v-if="form.clientMode === 'existing'">
-                    <select v-model="form.clientId" class="form-select" :class="{ 'is-invalid': errors.clientId }">
+                    <select
+                      v-model="form.clientId"
+                      class="form-select"
+                      :class="{ 'is-invalid': errors.clientId }"
+                    >
                       <option value="">Selecciona un cliente</option>
-                      <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }} - {{ c.phone }}</option>
+                      <option v-for="c in clients" :key="c.id" :value="c.id">
+                        {{ c.name }} - {{ c.phone }}
+                      </option>
                     </select>
                     <div class="invalid-feedback" v-if="errors.clientId">{{ errors.clientId }}</div>
                   </div>
                   <div v-else class="row g-2">
                     <div class="col-md-4">
-                      <input v-model="form.client.name" type="text" class="form-control" placeholder="Nombre completo" :class="{ 'is-invalid': errors.clientName }" />
-                      <div class="invalid-feedback" v-if="errors.clientName">{{ errors.clientName }}</div>
+                      <input
+                        v-model="form.client.name"
+                        type="text"
+                        class="form-control"
+                        placeholder="Nombre completo"
+                        :class="{ 'is-invalid': errors.clientName }"
+                      />
+                      <div class="invalid-feedback" v-if="errors.clientName">
+                        {{ errors.clientName }}
+                      </div>
                     </div>
                     <div class="col-md-4">
-                      <input v-model="form.client.phone" type="tel" class="form-control" placeholder="Teléfono" />
+                      <input
+                        v-model="form.client.phone"
+                        type="tel"
+                        class="form-control"
+                        placeholder="Teléfono"
+                      />
                     </div>
                     <div class="col-md-4">
-                      <input v-model="form.client.email" type="email" class="form-control" placeholder="Email" />
+                      <input
+                        v-model="form.client.email"
+                        type="email"
+                        class="form-control"
+                        placeholder="Email"
+                      />
                     </div>
                   </div>
                 </div>
@@ -611,35 +644,65 @@ const saveAppointment = async () => {
                 <!-- Servicio y Especialista -->
                 <div class="col-md-6">
                   <label class="form-label">Servicio</label>
-                  <select v-model="form.serviceId" class="form-select" :class="{ 'is-invalid': errors.serviceId }">
+                  <select
+                    v-model="form.serviceId"
+                    class="form-select"
+                    :class="{ 'is-invalid': errors.serviceId }"
+                  >
                     <option value="">Selecciona un servicio</option>
-                    <option v-for="s in services" :key="s.id" :value="s.id">{{ s.name }} ({{ s.duration }} min)</option>
+                    <option v-for="s in services" :key="s.id" :value="s.id">
+                      {{ s.name }} ({{ s.duration }} min)
+                    </option>
                   </select>
                   <div class="invalid-feedback" v-if="errors.serviceId">{{ errors.serviceId }}</div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Especialista</label>
-                  <select v-model="form.specialistId" class="form-select" :class="{ 'is-invalid': errors.specialistId }">
+                  <select
+                    v-model="form.specialistId"
+                    class="form-select"
+                    :class="{ 'is-invalid': errors.specialistId }"
+                  >
                     <option value="">Selecciona un especialista</option>
-                    <option v-for="sp in specialists" :key="sp.id" :value="sp.id">{{ sp.name }}</option>
+                    <option v-for="sp in specialists" :key="sp.id" :value="sp.id">
+                      {{ sp.name }}
+                    </option>
                   </select>
-                  <div class="invalid-feedback" v-if="errors.specialistId">{{ errors.specialistId }}</div>
+                  <div class="invalid-feedback" v-if="errors.specialistId">
+                    {{ errors.specialistId }}
+                  </div>
                 </div>
 
                 <!-- Fecha y hora -->
                 <div class="col-md-4">
                   <label class="form-label">Fecha</label>
-                  <input v-model="form.date" type="date" class="form-control" :class="{ 'is-invalid': errors.date }" />
+                  <input
+                    v-model="form.date"
+                    type="date"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.date }"
+                  />
                   <div class="invalid-feedback" v-if="errors.date">{{ errors.date }}</div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Hora</label>
-                  <input v-model="form.time" type="time" class="form-control" :class="{ 'is-invalid': errors.time }" />
+                  <input
+                    v-model="form.time"
+                    type="time"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.time }"
+                  />
                   <div class="invalid-feedback" v-if="errors.time">{{ errors.time }}</div>
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Duración (min)</label>
-                  <input v-model.number="form.duration" type="number" min="15" step="5" class="form-control" />
+                  <input
+                    v-model.number="form.duration"
+                    type="number"
+                    min="15"
+                    step="5"
+                    class="form-control"
+                  />
                 </div>
 
                 <!-- Precio y estado -->
@@ -647,7 +710,13 @@ const saveAppointment = async () => {
                   <label class="form-label">Precio</label>
                   <div class="input-group">
                     <span class="input-group-text">$</span>
-                    <input v-model.number="form.price" type="number" min="0" step="50" class="form-control" />
+                    <input
+                      v-model.number="form.price"
+                      type="number"
+                      min="0"
+                      step="50"
+                      class="form-control"
+                    />
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -663,7 +732,12 @@ const saveAppointment = async () => {
                 <!-- Notas -->
                 <div class="col-12">
                   <label class="form-label">Notas</label>
-                  <textarea v-model="form.notes" rows="3" class="form-control" placeholder="Observaciones, indicaciones, etc."></textarea>
+                  <textarea
+                    v-model="form.notes"
+                    rows="3"
+                    class="form-control"
+                    placeholder="Observaciones, indicaciones, etc."
+                  ></textarea>
                 </div>
               </div>
             </form>
