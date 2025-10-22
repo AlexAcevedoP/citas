@@ -1,34 +1,36 @@
 # ETAPA 7: GESTIÓN DE PRODUCTOS E INVENTARIO
 
 ## 🎯 Objetivo
+
 Implementar un módulo completo para la gestión de productos y control de inventario, especialmente útil para negocios que venden productos retail (dermocosmética, salones de belleza, clínicas).
 
 ## 📊 Estructura de Datos
 
 ### Colección: `businesses/{businessId}/products`
+
 ```javascript
 {
   // Información básica
   name: string,              // Nombre del producto
   description: string,       // Descripción detallada
   sku: string,              // Código único del producto (opcional)
-  
+
   // Categorización
   category: string,          // dermocosmetics | treatments | accessories | equipment | other
   brand: string,            // Marca o laboratorio
-  
+
   // Precios
   price: number,            // Precio de venta al público
   cost: number,             // Costo de adquisición
-  
+
   // Inventario
   stock: number,            // Cantidad disponible
   minStock: number,         // Stock mínimo (alerta)
   unit: string,             // unidad | ml | gr | caja | paquete
-  
+
   // Estado
   active: boolean,          // Producto activo/inactivo
-  
+
   // Metadatos
   createdAt: timestamp,
   updatedAt: timestamp
@@ -36,6 +38,7 @@ Implementar un módulo completo para la gestión de productos y control de inven
 ```
 
 ### Colección: `businesses/{businessId}/productSales`
+
 ```javascript
 {
   // Información de la venta
@@ -48,17 +51,17 @@ Implementar un módulo completo para la gestión de productos y control de inven
     }
   ],
   total: number,            // Total de la venta
-  
+
   // Cliente
   customerName: string,     // Nombre del cliente (opcional)
-  
+
   // Pago
   paymentMethod: string,    // cash | card | transfer
-  
+
   // Referencias
   appointmentId: string,    // Si la venta está asociada a una cita (opcional)
   notes: string,            // Notas adicionales
-  
+
   // Fecha
   date: string,             // YYYY-MM-DD
   createdAt: timestamp
@@ -70,6 +73,7 @@ Implementar un módulo completo para la gestión de productos y control de inven
 ### 1. Gestión de Productos (Tab Products)
 
 #### Catálogo de Productos
+
 - **Lista completa** con información clave
 - **Búsqueda** por nombre, SKU o marca
 - **Filtros** por categoría
@@ -77,22 +81,15 @@ Implementar un módulo completo para la gestión de productos y control de inven
 - **CRUD completo**: crear, editar, eliminar productos
 
 #### Formulario de Producto
+
 ```vue
-Campos:
-- Nombre (requerido)
-- Descripción
-- SKU (código único)
-- Categoría (select)
-- Marca/Laboratorio
-- Precio de venta (requerido)
-- Costo de adquisición
-- Unidad de medida (select)
-- Stock inicial
-- Stock mínimo (alerta)
-- Estado activo/inactivo
+Campos: - Nombre (requerido) - Descripción - SKU (código único) - Categoría (select) -
+Marca/Laboratorio - Precio de venta (requerido) - Costo de adquisición - Unidad de medida (select) -
+Stock inicial - Stock mínimo (alerta) - Estado activo/inactivo
 ```
 
 #### Alertas de Stock Bajo
+
 - Indicador visual cuando `stock <= minStock`
 - Lista específica de productos con stock bajo
 - Acceso rápido para ajuste de inventario
@@ -100,6 +97,7 @@ Campos:
 ### 2. Ventas de Productos (Tab Sales)
 
 #### Registro de Ventas
+
 - **Venta multi-producto**: agregar múltiples productos en una sola transacción
 - **Selección de productos**: dropdown con productos activos y stock disponible
 - **Cálculo automático**: precio unitario se completa automáticamente
@@ -109,12 +107,15 @@ Campos:
 - **Asociación con citas**: campo para vincular venta a una cita (opcional)
 
 #### Actualización Automática de Stock
+
 Al registrar una venta:
+
 1. Se descuenta automáticamente el stock de cada producto vendido
 2. Se actualiza la base de datos en tiempo real
 3. Se registra la transacción completa
 
 #### Historial de Ventas
+
 - Lista cronológica de todas las ventas
 - Información resumida: fecha, cliente, cantidad de productos, total
 - Método de pago utilizado
@@ -123,12 +124,15 @@ Al registrar una venta:
 ### 3. Control de Inventario (Tab Inventory)
 
 #### Dashboard de Inventario
+
 - **Valor total del inventario**: suma de (stock × costo) de todos los productos
 - **Productos activos**: contador de productos habilitados
 - **Alertas de stock bajo**: productos que requieren reabastecimiento
 
 #### Ajustes de Inventario
+
 Tres tipos de movimientos:
+
 1. **Entrada (in)**: agregar stock
    - Ejemplo: nueva compra de productos
 2. **Salida (out)**: reducir stock
@@ -137,6 +141,7 @@ Tres tipos de movimientos:
    - Ejemplo: corrección por conteo físico
 
 Cada movimiento incluye:
+
 - Cantidad
 - Motivo (razón del movimiento)
 - Referencia (# factura, # pedido, etc.)
@@ -144,18 +149,23 @@ Cada movimiento incluye:
 ### 4. Reportes y Análisis (Tab Reports)
 
 #### Métricas Generales
+
 - **Ventas totales**: suma de todas las transacciones
 - **Ticket promedio**: venta total / cantidad de transacciones
 - **Productos vendidos**: suma total de unidades vendidas
 
 #### Métodos de Pago
+
 Desglose de ventas por método:
+
 - Efectivo
 - Tarjeta
 - Transferencia
 
 #### Top 10 Productos Más Vendidos
+
 Ranking con:
+
 - Posición (medallas para top 3)
 - Nombre del producto
 - Cantidad total vendida
@@ -164,11 +174,13 @@ Ranking con:
 ## 🎨 Interfaz de Usuario
 
 ### Navegación por Tabs
+
 ```
 [Productos] [Ventas] [Inventario] [Reportes]
 ```
 
 ### Estados Visuales
+
 ```css
 Stock Status:
 - Sin stock: badge-danger (rojo)
@@ -180,6 +192,7 @@ Estado activo/inactivo: badge-success/secondary
 ```
 
 ### Acciones Rápidas
+
 - Botón "Ajustar stock" directo desde lista de productos
 - Editar/Eliminar desde cada fila
 - Modal de confirmación para eliminaciones
@@ -187,6 +200,7 @@ Estado activo/inactivo: badge-success/secondary
 ## 💡 Casos de Uso
 
 ### Caso 1: Negocio de Dermocosmética
+
 ```
 1. Agregar productos:
    - Cremas faciales
@@ -207,6 +221,7 @@ Estado activo/inactivo: badge-success/secondary
 ```
 
 ### Caso 2: Salón de Belleza
+
 ```
 1. Catálogo de productos:
    - Shampoos profesionales
@@ -228,16 +243,19 @@ Estado activo/inactivo: badge-success/secondary
 ## 🔗 Integraciones
 
 ### Con Módulo de Citas
+
 - Posibilidad de vincular venta a una cita específica
 - Campo `appointmentId` en la venta
 - Permite análisis de productos vendidos por tratamiento
 
 ### Con Módulo de Facturación
+
 - Las ventas de productos pueden integrarse en los reportes financieros
 - Suma adicional de ingresos aparte de servicios
 - Análisis de rentabilidad por categoría
 
 ### Con Módulo de Reportes
+
 - Datos de productos para métricas generales del negocio
 - Análisis de preferencias de clientes
 - Tendencias de consumo
@@ -245,6 +263,7 @@ Estado activo/inactivo: badge-success/secondary
 ## 📈 KPIs y Métricas
 
 ### Métricas de Inventario
+
 ```javascript
 // Valor del inventario
 totalInventoryValue = Σ(product.stock × product.cost)
@@ -257,6 +276,7 @@ coverageDays = currentStock / averageDailySales
 ```
 
 ### Métricas de Ventas
+
 ```javascript
 // Ticket promedio
 averageTicket = totalSales / numberOfTransactions
@@ -269,12 +289,13 @@ averageItems = totalItems / numberOfTransactions
 ```
 
 ### Métricas de Productos
+
 ```javascript
 // Top performers
 topProducts = sortByQuantitySold(products).slice(0, 10)
 
 // Productos de baja rotación
-slowMoving = products.filter(p => 
+slowMoving = products.filter(p =>
   p.lastSale < 90daysAgo && p.stock > 0
 )
 ```
@@ -282,49 +303,54 @@ slowMoving = products.filter(p =>
 ## 🔧 Funciones Principales
 
 ### Gestión de Productos
+
 ```javascript
 // CRUD básico
-saveProduct()      // Crear o actualizar producto
-deleteProduct(id)  // Eliminar producto
+saveProduct() // Crear o actualizar producto
+deleteProduct(id) // Eliminar producto
 
 // Validaciones
-validateProduct()  // Validar formulario
-getStockStatus()   // Determinar estado del stock
+validateProduct() // Validar formulario
+getStockStatus() // Determinar estado del stock
 ```
 
 ### Ventas
+
 ```javascript
 // Proceso de venta
-saveSale()            // Registrar venta
-updateProductStock()  // Actualizar inventario
-onProductSelect()     // Autocompletar precio
+saveSale() // Registrar venta
+updateProductStock() // Actualizar inventario
+onProductSelect() // Autocompletar precio
 
 // Cálculos
-saleTotal()          // Total de la venta
-validateSale()       // Validar transacción
+saleTotal() // Total de la venta
+validateSale() // Validar transacción
 ```
 
 ### Inventario
+
 ```javascript
 // Movimientos
-saveInventoryMovement()  // Registrar ajuste
+saveInventoryMovement() // Registrar ajuste
 
 // Cálculos
-totalInventoryValue()    // Valor total del inventario
-lowStockProducts()       // Productos con alerta
+totalInventoryValue() // Valor total del inventario
+lowStockProducts() // Productos con alerta
 ```
 
 ### Reportes
+
 ```javascript
 // Análisis
-salesStats()           // Estadísticas generales
-topSellingProducts()   // Ranking de productos
-calculateMargin()      // Margen de utilidad
+salesStats() // Estadísticas generales
+topSellingProducts() // Ranking de productos
+calculateMargin() // Margen de utilidad
 ```
 
 ## 🎯 Mejoras Futuras
 
 ### Nivel 1: Funcionalidades Básicas
+
 - [ ] Códigos de barras para productos (escaneo)
 - [ ] Exportar catálogo a Excel/CSV
 - [ ] Importar productos desde archivo
@@ -332,6 +358,7 @@ calculateMargin()      // Margen de utilidad
 - [ ] Variantes de productos (tallas, colores)
 
 ### Nivel 2: Análisis Avanzado
+
 - [ ] Gráficas de ventas por período
 - [ ] Predicción de demanda
 - [ ] Alertas automáticas por email/SMS
@@ -339,6 +366,7 @@ calculateMargin()      // Margen de utilidad
 - [ ] Comparativa de períodos
 
 ### Nivel 3: Integraciones
+
 - [ ] Proveedores (gestión de compras)
 - [ ] Órdenes de compra automáticas
 - [ ] Integración con facturación electrónica
@@ -346,6 +374,7 @@ calculateMargin()      // Margen de utilidad
 - [ ] Descuentos y promociones
 
 ### Nivel 4: Optimización
+
 - [ ] Historial de movimientos de inventario
 - [ ] Trazabilidad de lotes
 - [ ] Fechas de caducidad
@@ -355,6 +384,7 @@ calculateMargin()      // Margen de utilidad
 ## 🔐 Consideraciones de Seguridad
 
 ### Permisos por Rol
+
 ```javascript
 admin:
   - CRUD completo de productos
@@ -374,12 +404,14 @@ specialist:
 ```
 
 ### Validaciones
+
 - Stock no puede ser negativo
 - Precio de venta debe ser mayor a 0
 - Cantidad en ventas debe ser ≤ stock disponible
 - SKU único (si se proporciona)
 
 ### Auditoría
+
 - Registro de `createdAt` y `updatedAt`
 - Rastreo de quién hizo cada movimiento (futura mejora)
 - Logs de cambios de stock importantes
@@ -387,6 +419,7 @@ specialist:
 ## 📝 Notas de Implementación
 
 ### Firestore Security Rules
+
 ```javascript
 // Productos
 match /businesses/{businessId}/products/{productId} {
@@ -403,15 +436,26 @@ match /businesses/{businessId}/productSales/{saleId} {
 ```
 
 ### Índices Recomendados
+
 ```javascript
 // products collection
-{ businessId, category, name }
-{ businessId, active, stock }
-{ businessId, sku }
+{
+  ;(businessId, category, name)
+}
+{
+  ;(businessId, active, stock)
+}
+{
+  ;(businessId, sku)
+}
 
 // productSales collection
-{ businessId, date }
-{ businessId, createdAt }
+{
+  ;(businessId, date)
+}
+{
+  ;(businessId, createdAt)
+}
 ```
 
 ## 🎓 Conclusión

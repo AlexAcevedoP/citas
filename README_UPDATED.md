@@ -170,12 +170,14 @@ Ver el archivo [FIRESTORE_STRUCTURE.md](./FIRESTORE_STRUCTURE.md) para detalles 
 ### Colecciones Principales:
 
 **Globales:**
+
 - `businesses` - Información de negocios
 - `appointments` - Citas agendadas
 - `customers` - Base de clientes
 - `users` - Usuarios del sistema
 
 **Por Negocio (Subcolecciones):**
+
 - `businesses/{id}/services` - Servicios del negocio
 - `businesses/{id}/staff` - Personal del negocio
 - `businesses/{id}/products` - Catálogo de productos 🆕

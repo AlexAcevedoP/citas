@@ -84,7 +84,7 @@ const filteredProducts = computed(() => {
       (p) =>
         p.name?.toLowerCase().includes(term) ||
         p.sku?.toLowerCase().includes(term) ||
-        p.brand?.toLowerCase().includes(term)
+        p.brand?.toLowerCase().includes(term),
     )
   }
 
@@ -100,16 +100,22 @@ const lowStockProducts = computed(() => {
 })
 
 const totalInventoryValue = computed(() => {
-  return products.value.reduce((sum, p) => sum + (p.stock * p.cost), 0)
+  return products.value.reduce((sum, p) => sum + p.stock * p.cost, 0)
 })
 
 const salesStats = computed(() => {
   const total = sales.value.reduce((sum, s) => sum + s.total, 0)
   const count = sales.value.length
   const byMethod = {
-    cash: sales.value.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0),
-    card: sales.value.filter(s => s.paymentMethod === 'card').reduce((sum, s) => sum + s.total, 0),
-    transfer: sales.value.filter(s => s.paymentMethod === 'transfer').reduce((sum, s) => sum + s.total, 0),
+    cash: sales.value
+      .filter((s) => s.paymentMethod === 'cash')
+      .reduce((sum, s) => sum + s.total, 0),
+    card: sales.value
+      .filter((s) => s.paymentMethod === 'card')
+      .reduce((sum, s) => sum + s.total, 0),
+    transfer: sales.value
+      .filter((s) => s.paymentMethod === 'transfer')
+      .reduce((sum, s) => sum + s.total, 0),
   }
 
   return { total, count, byMethod }
@@ -117,9 +123,9 @@ const salesStats = computed(() => {
 
 const topSellingProducts = computed(() => {
   const productSales = {}
-  
-  sales.value.forEach(sale => {
-    sale.items.forEach(item => {
+
+  sales.value.forEach((sale) => {
+    sale.items.forEach((item) => {
       if (!productSales[item.productId]) {
         productSales[item.productId] = {
           productId: item.productId,
@@ -153,7 +159,7 @@ onMounted(() => {
     (err) => {
       error.value = err.message
       loading.value = false
-    }
+    },
   )
 
   // Listener de ventas
@@ -212,7 +218,10 @@ const saveProduct = async () => {
     }
 
     if (editingProductId.value) {
-      await updateDoc(doc(db, `businesses/${props.business.id}/products/${editingProductId.value}`), payload)
+      await updateDoc(
+        doc(db, `businesses/${props.business.id}/products/${editingProductId.value}`),
+        payload,
+      )
     } else {
       await addDoc(productsRef.value, {
         ...payload,
@@ -264,7 +273,7 @@ const removeSaleItem = (index) => {
 }
 
 const onProductSelect = (item) => {
-  const product = products.value.find(p => p.id === item.productId)
+  const product = products.value.find((p) => p.id === item.productId)
   if (product) {
     item.price = product.price
     item.productName = product.name
@@ -272,13 +281,14 @@ const onProductSelect = (item) => {
 }
 
 const saleTotal = computed(() => {
-  return saleForm.value.items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+  return saleForm.value.items.reduce((sum, item) => sum + item.quantity * item.price, 0)
 })
 
 const validateSale = () => {
   const errors = {}
   if (saleForm.value.items.length === 0) errors.items = 'Agrega al menos un producto'
-  if (saleForm.value.items.some(i => !i.productId)) errors.items = 'Selecciona todos los productos'
+  if (saleForm.value.items.some((i) => !i.productId))
+    errors.items = 'Selecciona todos los productos'
   saleErrors.value = errors
   return Object.keys(errors).length === 0
 }
@@ -302,7 +312,7 @@ const saveSale = async () => {
 
     // Actualizar stock de productos
     for (const item of saleForm.value.items) {
-      const product = products.value.find(p => p.id === item.productId)
+      const product = products.value.find((p) => p.id === item.productId)
       if (product) {
         await updateDoc(doc(db, `businesses/${props.business.id}/products/${item.productId}`), {
           stock: product.stock - item.quantity,
@@ -334,7 +344,7 @@ const openInventoryModal = (product) => {
 const saveInventoryMovement = async () => {
   loading.value = true
   try {
-    const product = products.value.find(p => p.id === inventoryForm.value.productId)
+    const product = products.value.find((p) => p.id === inventoryForm.value.productId)
     let newStock = product.stock
 
     if (inventoryForm.value.type === 'in') {
@@ -345,9 +355,12 @@ const saveInventoryMovement = async () => {
       newStock = inventoryForm.value.quantity
     }
 
-    await updateDoc(doc(db, `businesses/${props.business.id}/products/${inventoryForm.value.productId}`), {
-      stock: newStock,
-    })
+    await updateDoc(
+      doc(db, `businesses/${props.business.id}/products/${inventoryForm.value.productId}`),
+      {
+        stock: newStock,
+      },
+    )
 
     // Registrar movimiento (opcional - puedes crear colección de movimientos)
     showInventoryModal.value = false
@@ -386,22 +399,38 @@ const getStockStatus = (product) => {
     <!-- Navegación por tabs -->
     <ul class="nav nav-pills mb-4">
       <li class="nav-item">
-        <button class="nav-link" :class="{ active: activeTab === 'products' }" @click="activeTab = 'products'">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'products' }"
+          @click="activeTab = 'products'"
+        >
           <i class="bi bi-box-seam"></i> Productos
         </button>
       </li>
       <li class="nav-item">
-        <button class="nav-link" :class="{ active: activeTab === 'sales' }" @click="activeTab = 'sales'">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'sales' }"
+          @click="activeTab = 'sales'"
+        >
           <i class="bi bi-cart"></i> Ventas
         </button>
       </li>
       <li class="nav-item">
-        <button class="nav-link" :class="{ active: activeTab === 'inventory' }" @click="activeTab = 'inventory'">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'inventory' }"
+          @click="activeTab = 'inventory'"
+        >
           <i class="bi bi-boxes"></i> Inventario
         </button>
       </li>
       <li class="nav-item">
-        <button class="nav-link" :class="{ active: activeTab === 'reports' }" @click="activeTab = 'reports'">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'reports' }"
+          @click="activeTab = 'reports'"
+        >
           <i class="bi bi-graph-up"></i> Reportes
         </button>
       </li>
@@ -415,7 +444,12 @@ const getStockStatus = (product) => {
           <div class="row g-3 align-items-end">
             <div class="col-md-4">
               <label class="form-label small">Buscar</label>
-              <input v-model="search" type="text" class="form-control" placeholder="Nombre, SKU o marca" />
+              <input
+                v-model="search"
+                type="text"
+                class="form-control"
+                placeholder="Nombre, SKU o marca"
+              />
             </div>
             <div class="col-md-3">
               <label class="form-label small">Categoría</label>
@@ -490,10 +524,17 @@ const getStockStatus = (product) => {
                     </span>
                   </td>
                   <td class="text-end">
-                    <button class="btn btn-sm btn-outline-info me-1" @click="openInventoryModal(p)" title="Ajustar stock">
+                    <button
+                      class="btn btn-sm btn-outline-info me-1"
+                      @click="openInventoryModal(p)"
+                      title="Ajustar stock"
+                    >
                       <i class="bi bi-box"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-primary me-1" @click="openProductModal(p)">
+                    <button
+                      class="btn btn-sm btn-outline-primary me-1"
+                      @click="openProductModal(p)"
+                    >
                       <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" @click="deleteProduct(p.id)">
@@ -570,7 +611,7 @@ const getStockStatus = (product) => {
           <div class="card">
             <div class="card-body">
               <h6 class="text-muted mb-2">Productos Activos</h6>
-              <h3 class="mb-0 text-success">{{ products.filter(p => p.active).length }}</h3>
+              <h3 class="mb-0 text-success">{{ products.filter((p) => p.active).length }}</h3>
             </div>
           </div>
         </div>
@@ -640,7 +681,9 @@ const getStockStatus = (product) => {
             <div class="card-body">
               <h6 class="text-muted mb-2">Ticket Promedio</h6>
               <h3 class="mb-0 text-info">
-                {{ salesStats.count > 0 ? formatCurrency(salesStats.total / salesStats.count) : '$0' }}
+                {{
+                  salesStats.count > 0 ? formatCurrency(salesStats.total / salesStats.count) : '$0'
+                }}
               </h3>
             </div>
           </div>
@@ -650,7 +693,12 @@ const getStockStatus = (product) => {
             <div class="card-body">
               <h6 class="text-muted mb-2">Productos Vendidos</h6>
               <h3 class="mb-0 text-primary">
-                {{ sales.reduce((sum, s) => sum + s.items.reduce((itemSum, i) => itemSum + i.quantity, 0), 0) }}
+                {{
+                  sales.reduce(
+                    (sum, s) => sum + s.items.reduce((itemSum, i) => itemSum + i.quantity, 0),
+                    0,
+                  )
+                }}
               </h3>
             </div>
           </div>
@@ -678,7 +726,16 @@ const getStockStatus = (product) => {
               <tbody>
                 <tr v-for="(item, index) in topSellingProducts" :key="item.productId">
                   <td>
-                    <span class="badge" :class="index === 0 ? 'bg-warning' : index === 1 ? 'bg-secondary' : 'bg-light text-dark'">
+                    <span
+                      class="badge"
+                      :class="
+                        index === 0
+                          ? 'bg-warning'
+                          : index === 1
+                            ? 'bg-secondary'
+                            : 'bg-light text-dark'
+                      "
+                    >
                       {{ index + 1 }}
                     </span>
                   </td>
@@ -696,19 +753,33 @@ const getStockStatus = (product) => {
     </div>
 
     <!-- Modal: Producto -->
-    <div v-if="showProductModal" class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div
+      v-if="showProductModal"
+      class="modal d-block"
+      tabindex="-1"
+      style="background: rgba(0, 0, 0, 0.5)"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{ editingProductId ? 'Editar Producto' : 'Nuevo Producto' }}</h5>
+            <h5 class="modal-title">
+              {{ editingProductId ? 'Editar Producto' : 'Nuevo Producto' }}
+            </h5>
             <button type="button" class="btn-close" @click="showProductModal = false"></button>
           </div>
           <div class="modal-body">
             <div class="row g-3">
               <div class="col-md-8">
                 <label class="form-label">Nombre del Producto</label>
-                <input v-model="productForm.name" type="text" class="form-control" :class="{ 'is-invalid': productErrors.name }" />
-                <div class="invalid-feedback" v-if="productErrors.name">{{ productErrors.name }}</div>
+                <input
+                  v-model="productForm.name"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': productErrors.name }"
+                />
+                <div class="invalid-feedback" v-if="productErrors.name">
+                  {{ productErrors.name }}
+                </div>
               </div>
               <div class="col-md-4">
                 <label class="form-label">SKU</label>
@@ -716,7 +787,11 @@ const getStockStatus = (product) => {
               </div>
               <div class="col-12">
                 <label class="form-label">Descripción</label>
-                <textarea v-model="productForm.description" rows="2" class="form-control"></textarea>
+                <textarea
+                  v-model="productForm.description"
+                  rows="2"
+                  class="form-control"
+                ></textarea>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Categoría</label>
@@ -736,15 +811,30 @@ const getStockStatus = (product) => {
                 <label class="form-label">Precio de Venta</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input v-model.number="productForm.price" type="number" min="0" step="0.01" class="form-control" :class="{ 'is-invalid': productErrors.price }" />
+                  <input
+                    v-model.number="productForm.price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="form-control"
+                    :class="{ 'is-invalid': productErrors.price }"
+                  />
                 </div>
-                <div class="invalid-feedback" v-if="productErrors.price">{{ productErrors.price }}</div>
+                <div class="invalid-feedback" v-if="productErrors.price">
+                  {{ productErrors.price }}
+                </div>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Costo</label>
                 <div class="input-group">
                   <span class="input-group-text">$</span>
-                  <input v-model.number="productForm.cost" type="number" min="0" step="0.01" class="form-control" />
+                  <input
+                    v-model.number="productForm.cost"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="form-control"
+                  />
                 </div>
               </div>
               <div class="col-md-4">
@@ -759,23 +849,43 @@ const getStockStatus = (product) => {
               </div>
               <div class="col-md-6">
                 <label class="form-label">Stock Inicial</label>
-                <input v-model.number="productForm.stock" type="number" min="0" class="form-control" :class="{ 'is-invalid': productErrors.stock }" />
-                <div class="invalid-feedback" v-if="productErrors.stock">{{ productErrors.stock }}</div>
+                <input
+                  v-model.number="productForm.stock"
+                  type="number"
+                  min="0"
+                  class="form-control"
+                  :class="{ 'is-invalid': productErrors.stock }"
+                />
+                <div class="invalid-feedback" v-if="productErrors.stock">
+                  {{ productErrors.stock }}
+                </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Stock Mínimo (Alerta)</label>
-                <input v-model.number="productForm.minStock" type="number" min="0" class="form-control" />
+                <input
+                  v-model.number="productForm.minStock"
+                  type="number"
+                  min="0"
+                  class="form-control"
+                />
               </div>
               <div class="col-12">
                 <div class="form-check form-switch">
-                  <input v-model="productForm.active" class="form-check-input" type="checkbox" id="productActive" />
+                  <input
+                    v-model="productForm.active"
+                    class="form-check-input"
+                    type="checkbox"
+                    id="productActive"
+                  />
                   <label class="form-check-label" for="productActive">Producto activo</label>
                 </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showProductModal = false">Cancelar</button>
+            <button type="button" class="btn btn-secondary" @click="showProductModal = false">
+              Cancelar
+            </button>
             <button type="button" class="btn btn-primary" @click="saveProduct" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
               Guardar
@@ -786,7 +896,12 @@ const getStockStatus = (product) => {
     </div>
 
     <!-- Modal: Venta -->
-    <div v-if="showSaleModal" class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div
+      v-if="showSaleModal"
+      class="modal d-block"
+      tabindex="-1"
+      style="background: rgba(0, 0, 0, 0.5)"
+    >
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -796,18 +911,31 @@ const getStockStatus = (product) => {
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Cliente (opcional)</label>
-              <input v-model="saleForm.customerName" type="text" class="form-control" placeholder="Nombre del cliente" />
+              <input
+                v-model="saleForm.customerName"
+                type="text"
+                class="form-control"
+                placeholder="Nombre del cliente"
+              />
             </div>
 
             <hr />
             <h6 class="mb-3">Productos</h6>
 
-            <div v-for="(item, index) in saleForm.items" :key="index" class="row g-2 mb-3 align-items-end">
+            <div
+              v-for="(item, index) in saleForm.items"
+              :key="index"
+              class="row g-2 mb-3 align-items-end"
+            >
               <div class="col-md-5">
                 <label class="form-label small">Producto</label>
-                <select v-model="item.productId" @change="onProductSelect(item)" class="form-select">
+                <select
+                  v-model="item.productId"
+                  @change="onProductSelect(item)"
+                  class="form-select"
+                >
                   <option value="">Selecciona...</option>
-                  <option v-for="p in products.filter(pr => pr.active)" :key="p.id" :value="p.id">
+                  <option v-for="p in products.filter((pr) => pr.active)" :key="p.id" :value="p.id">
                     {{ p.name }} (Stock: {{ p.stock }})
                   </option>
                 </select>
@@ -818,10 +946,21 @@ const getStockStatus = (product) => {
               </div>
               <div class="col-md-3">
                 <label class="form-label small">Precio</label>
-                <input v-model.number="item.price" type="number" min="0" step="0.01" class="form-control" />
+                <input
+                  v-model.number="item.price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="form-control"
+                />
               </div>
               <div class="col-md-2">
-                <button v-if="saleForm.items.length > 1" type="button" class="btn btn-outline-danger w-100" @click="removeSaleItem(index)">
+                <button
+                  v-if="saleForm.items.length > 1"
+                  type="button"
+                  class="btn btn-outline-danger w-100"
+                  @click="removeSaleItem(index)"
+                >
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -853,10 +992,14 @@ const getStockStatus = (product) => {
               </div>
             </div>
 
-            <div v-if="saleErrors.items" class="alert alert-danger mt-3">{{ saleErrors.items }}</div>
+            <div v-if="saleErrors.items" class="alert alert-danger mt-3">
+              {{ saleErrors.items }}
+            </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showSaleModal = false">Cancelar</button>
+            <button type="button" class="btn btn-secondary" @click="showSaleModal = false">
+              Cancelar
+            </button>
             <button type="button" class="btn btn-primary" @click="saveSale" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
               Registrar Venta
@@ -867,7 +1010,12 @@ const getStockStatus = (product) => {
     </div>
 
     <!-- Modal: Ajuste de Inventario -->
-    <div v-if="showInventoryModal" class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div
+      v-if="showInventoryModal"
+      class="modal d-block"
+      tabindex="-1"
+      style="background: rgba(0, 0, 0, 0.5)"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -889,23 +1037,49 @@ const getStockStatus = (product) => {
             </div>
             <div class="mb-3">
               <label class="form-label">Cantidad</label>
-              <input v-model.number="inventoryForm.quantity" type="number" min="0" class="form-control" />
+              <input
+                v-model.number="inventoryForm.quantity"
+                type="number"
+                min="0"
+                class="form-control"
+              />
               <small class="text-muted">
-                {{ inventoryForm.type === 'adjustment' ? 'Nueva cantidad total' : 'Cantidad a ' + (inventoryForm.type === 'in' ? 'agregar' : 'quitar') }}
+                {{
+                  inventoryForm.type === 'adjustment'
+                    ? 'Nueva cantidad total'
+                    : 'Cantidad a ' + (inventoryForm.type === 'in' ? 'agregar' : 'quitar')
+                }}
               </small>
             </div>
             <div class="mb-3">
               <label class="form-label">Motivo</label>
-              <input v-model="inventoryForm.reason" type="text" class="form-control" placeholder="Ej: Compra, venta, merma, corrección" />
+              <input
+                v-model="inventoryForm.reason"
+                type="text"
+                class="form-control"
+                placeholder="Ej: Compra, venta, merma, corrección"
+              />
             </div>
             <div class="mb-3">
               <label class="form-label">Referencia (opcional)</label>
-              <input v-model="inventoryForm.reference" type="text" class="form-control" placeholder="Ej: # factura, # pedido" />
+              <input
+                v-model="inventoryForm.reference"
+                type="text"
+                class="form-control"
+                placeholder="Ej: # factura, # pedido"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showInventoryModal = false">Cancelar</button>
-            <button type="button" class="btn btn-primary" @click="saveInventoryMovement" :disabled="loading">
+            <button type="button" class="btn btn-secondary" @click="showInventoryModal = false">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="saveInventoryMovement"
+              :disabled="loading"
+            >
               <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
               Guardar
             </button>
