@@ -9,6 +9,7 @@ import StaffManager from './business/StaffManager.vue'
 import BillingManager from './business/BillingManager.vue'
 import ReportsManager from './business/ReportsManager.vue'
 import SettingsManager from './business/SettingsManager.vue'
+import ProductsManager from './business/ProductsManager.vue'
 
 const businessStore = useBusinessStore()
 const appointmentsStore = useAppointmentsStore()
@@ -58,6 +59,12 @@ const modules = [
     name: 'Gestión de Personal',
     icon: 'bi-person-badge',
     color: '#0dcaf0',
+  },
+  {
+    id: 'products',
+    name: 'Gestión de Productos',
+    icon: 'bi-box',
+    color: '#ff6b6b',
   },
   {
     id: 'billing',
@@ -281,6 +288,11 @@ const toggleSidebar = () => {
         <!-- Módulo Personal -->
         <div v-else-if="currentModule === 'staff'" class="staff-module">
           <StaffManager :business="business" />
+        </div>
+
+        <!-- Módulo Productos -->
+        <div v-else-if="currentModule === 'products'" class="products-module">
+          <ProductsManager :business="business" />
         </div>
 
         <!-- Módulo Facturación -->

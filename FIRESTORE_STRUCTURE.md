@@ -163,6 +163,74 @@ Registro de pagos realizados en el negocio.
 }
 ```
 
+### **businesses/{businessId}/products** (Productos)
+
+Catálogo de productos para venta retail.
+
+```javascript
+{
+  id: "auto-generated-id",
+  // Información básica
+  name: "Crema Hidratante Facial",
+  description: "Crema hidratante con ácido hialurónico",
+  sku: "PROD-001", // Código único (opcional)
+  
+  // Categorización
+  category: "dermocosmetics", // dermocosmetics | treatments | accessories | equipment | other
+  brand: "La Roche-Posay",
+  
+  // Precios
+  price: 450.00, // Precio de venta
+  cost: 280.00,  // Costo de adquisición
+  
+  // Inventario
+  stock: 25,      // Cantidad disponible
+  minStock: 5,    // Stock mínimo (alerta)
+  unit: "unidad", // unidad | ml | gr | caja | paquete
+  
+  // Estado
+  active: true,
+  
+  // Metadatos
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### **businesses/{businessId}/productSales** (Ventas de Productos)
+
+Registro de ventas de productos.
+
+```javascript
+{
+  id: "auto-generated-id",
+  // Items vendidos
+  items: [
+    {
+      productId: "product-id",
+      productName: "Crema Hidratante Facial",
+      quantity: 2,
+      price: 450.00
+    }
+  ],
+  total: 1480.00, // Total de la venta
+  
+  // Cliente
+  customerName: "María González", // Opcional
+  
+  // Pago
+  paymentMethod: "card", // cash | card | transfer
+  
+  // Referencias
+  appointmentId: "appointment-id", // Opcional
+  notes: "Cliente frecuente",
+  
+  // Fecha
+  date: "2024-01-15", // YYYY-MM-DD
+  createdAt: Timestamp
+}
+```
+
 ---
 
 ## 📊 Colecciones Principales (Globales)

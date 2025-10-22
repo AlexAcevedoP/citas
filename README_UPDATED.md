@@ -23,15 +23,56 @@ Sistema completo de gestión de citas diseñado para múltiples tipos de negocio
 
 ### 📋 Funcionalidades
 
-- ✅ Calendario interactivo de citas
-- ✅ Gestión de servicios por negocio
-- ✅ Administración de empleados
-- ✅ Estadísticas y reportes
-- ✅ Base de datos de clientes
-- ✅ Múltiples vistas (calendario, lista)
-- ✅ Confirmación y cancelación de citas
-- ✅ Horarios personalizables
-- ✅ Notificaciones (email, SMS, WhatsApp) - próximamente
+#### Módulos Implementados
+
+1. **Gestión de Citas** (AppointmentsManager)
+   - ✅ Calendario interactivo de citas
+   - ✅ Creación y edición de citas
+   - ✅ Múltiples vistas (calendario, lista)
+   - ✅ Gestión de clientes integrada
+   - ✅ Filtros por fecha, estado, personal
+   - ✅ Estados: pendiente, confirmada, completada, cancelada
+
+2. **Gestión de Servicios** (ServicesManager)
+   - ✅ Catálogo de servicios por negocio
+   - ✅ Precios y duraciones personalizables
+   - ✅ Categorías de servicios
+   - ✅ Estados activo/inactivo
+
+3. **Gestión de Personal** (StaffManager)
+   - ✅ Administración de empleados
+   - ✅ Roles y especialidades
+   - ✅ Horarios y disponibilidad
+   - ✅ Asignación a servicios
+
+4. **Gestión de Productos** (ProductsManager) 🆕
+   - ✅ Catálogo de productos retail
+   - ✅ Control de inventario y stock
+   - ✅ Registro de ventas
+   - ✅ Alertas de stock bajo
+   - ✅ Reportes de productos más vendidos
+   - ✅ Integración con citas (ventas durante servicios)
+
+5. **Facturación y Pagos** (BillingManager)
+   - ✅ Registro de pagos
+   - ✅ Múltiples métodos de pago
+   - ✅ Reportes financieros
+   - ✅ Exportación a CSV
+   - ✅ Análisis por período
+
+6. **Reportes y Análisis** (ReportsManager)
+   - ✅ Dashboard con métricas clave
+   - ✅ Análisis de citas y tendencias
+   - ✅ Reportes financieros
+   - ✅ Rendimiento del personal
+   - ✅ Análisis de clientes
+
+7. **Configuración** (SettingsManager)
+   - ✅ Información del negocio
+   - ✅ Horarios de atención
+   - ✅ Configuración de citas
+   - ✅ Gestión de usuarios
+   - ✅ Preferencias generales
 
 ## 🛠️ Tecnologías
 
@@ -128,11 +169,19 @@ Ver el archivo [FIRESTORE_STRUCTURE.md](./FIRESTORE_STRUCTURE.md) para detalles 
 
 ### Colecciones Principales:
 
+**Globales:**
 - `businesses` - Información de negocios
 - `appointments` - Citas agendadas
 - `customers` - Base de clientes
 - `users` - Usuarios del sistema
-- `reviews` - Reseñas (opcional)
+
+**Por Negocio (Subcolecciones):**
+- `businesses/{id}/services` - Servicios del negocio
+- `businesses/{id}/staff` - Personal del negocio
+- `businesses/{id}/products` - Catálogo de productos 🆕
+- `businesses/{id}/productSales` - Ventas de productos 🆕
+- `businesses/{id}/payments` - Registro de pagos
+- `businesses/{id}/users` - Usuarios del negocio
 
 ## 🎨 Uso
 
