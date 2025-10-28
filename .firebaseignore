@@ -1,0 +1,26 @@
+# Firebase
+.firebase/
+.firebaserc
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log*
+
+# Firebase cache
+.firebase/
+*.cache
+
+# Firebase config
+.runtimeconfig.json
+
+# Uncomment this if you'd like to ignore your project's Firebase config file
+# firebase.json
+# .firebaserc
+
+# dist folder
+dist/
+dist-ssr/
